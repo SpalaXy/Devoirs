@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suivi Devoirs</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; background-color: #f4f4f9; }
+        h1 { color: #333; }
+        .button-container { margin-top: 20px; }
+        button { 
+            background-color: #4CAF50; 
+            color: white; 
+            font-size: 18px; 
+            padding: 10px 20px; 
+            margin: 10px; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer;
+        }
+        button:hover { background-color: #45a049; }
+        #time { font-size: 24px; margin: 20px; display: block; color: #333; }
+        .stats { margin-top: 30px; font-size: 18px; }
+    </style>
+</head>
+<body>
+
+    <h1>Suivi des Devoirs</h1>
+    <span id="time">00:00:00</span>
+    <div class="button-container">
+        <button onclick="startStop()">Démarrer / Arrêter</button>
+        <button onclick="reset()">Réinitialiser</button>
+    </div>
+
+    <div class="stats">
+        <p>Moyenne du mois : <span id="average-time">00:00:00</span></p>
+    </div>
+
+    <script>
+        let startTime, interval, elapsedTime = 0;
+        let running = false;
+        let totalTime = 0;
+        let sessionCount = 0;
+
+        // Fonction pour démarrer et arrêter le chronomètre
+        function startStop() {
+            if (running) {
+                clearInterval(interval);
+                running = false;
+                totalTime += elapsedTime;
+                sessionCount++;
+                updateAverage();
+            } else {
+                startTime = Date.now() - elapsedTime;
+                interval = setInterval(updateTime, 1000);
+                running = true;
+            }
+        }
+
+        // Fonction pour mettre à jour l'affichage du temps
+        function updateTime() {
+            elapsedTime = Date.now() - startTime;
+            let totalSeconds = Math.floor(elapsedTime / 1000);
+            let hours = Math.floor(totalSeconds / 3600);
+            let minutes = Math.floor((totalSeconds % 3600) / 60);
+            let seconds = totalSeconds % 60;
+            document.getElementById("time").innerText = 
+                `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        // Fonction pour réinitialiser le chronomètre
+        function reset() {
+            clearInterval(interval);
+            running = false;
+            elapsedTime = 0;
+            document.getElementById("time").innerText = "00:00:00";
+        }
+
+        // Calculer et afficher la moyenne mensuelle du temps de travail
+        function updateAverage() {
+            if (sessionCount > 0) {
+                let averageTime = totalTime / sessionCount;
+                let totalSeconds = Math.floor(averageTime / 1000);
+                let hours = Math.floor(totalSeconds / 3600);
+                let minutes = Math.floor((totalSeconds % 3600) / 60);
+                let seconds = totalSeconds % 60;
+                document.getElementById("average-time").innerText = 
+                    `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }
+        }
+    </script>
+
+</body>
+</html>
