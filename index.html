@@ -50,6 +50,29 @@
             margin-top: 20px;
             color: #555;
         }
+        #musicOption {
+            margin-top: 10px;
+        }
+        .sessions {
+            width: 100%;
+            max-width: 400px;
+            margin-top: 20px;
+        }
+        .session-item {
+            display: flex;
+            justify-content: space-between;
+            background: #fff;
+            padding: 10px;
+            margin: 5px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .music-yes {
+            color: green;
+        }
+        .music-no {
+            color: red;
+        }
     </style>
 </head>
 <body>
@@ -57,14 +80,24 @@
     <div id="chrono">00:00:00</div>
     <button class="btn start" onclick="startChrono()">Démarrer la session</button>
     <button class="btn stop" onclick="stopChrono()">Arrêter la session</button>
+    <div>
+        <label>
+            <input type="checkbox" id="musicOption"> Musique pendant le travail
+        </label>
+    </div>
     <div id="result"></div>
+    
+    <h2>Historique des sessions</h2>
+    <div class="sessions" id="sessionList"></div>
 
     <script>
         let startTime, interval;
+        let sessions = [];
+
         function startChrono() {
             startTime = Date.now();
             clearInterval(interval);
-            interval = setInterval(updateChrono, 1000);
+            interval = setInterval(updateChrono, 100);
             document.getElementById("result").innerHTML = "";
         }
 
@@ -73,7 +106,16 @@
             let elapsedTime = Math.floor((Date.now() - startTime) / 1000);
             let minutes = Math.floor(elapsedTime / 60);
             let seconds = elapsedTime % 60;
-            document.getElementById("result").innerHTML = `Temps total : ${minutes} min ${seconds} sec`;
+            let withMusic = document.getElementById("musicOption").checked ? "Oui" : "Non";
+
+            alert(`Session terminée !\nTemps total : ${minutes} min ${seconds} sec\nMusique : ${withMusic}`);
+            
+            sessions.push({
+                date: new Date().toLocaleString(),
+                duration: `${minutes} min ${seconds} sec`,
+                music: withMusic
+            });
+            updateSessionList();
         }
 
         function updateChrono() {
@@ -83,6 +125,17 @@
             let seconds = elapsedTime % 60;
             document.getElementById("chrono").textContent = 
                 `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+
+        function updateSessionList() {
+            let sessionList = document.getElementById("sessionList");
+            sessionList.innerHTML = "";
+            sessions.forEach(session => {
+                let sessionItem = document.createElement("div");
+                sessionItem.classList.add("session-item");
+                sessionItem.innerHTML = `<span>${session.date} - ${session.duration}</span> <span class="${session.music === 'Oui' ? 'music-yes' : 'music-no'}">${session.music}</span>`;
+                sessionList.appendChild(sessionItem);
+            });
         }
     </script>
 </body>
