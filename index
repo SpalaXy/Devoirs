@@ -3,92 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Suivi Devoirs</title>
+    <title>Chronomètre de Devoirs</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; background-color: #f4f4f9; }
-        h1 { color: #333; }
-        .button-container { margin-top: 20px; }
-        button { 
-            background-color: #4CAF50; 
-            color: white; 
-            font-size: 18px; 
-            padding: 10px 20px; 
-            margin: 10px; 
-            border: none; 
-            border-radius: 5px; 
-            cursor: pointer;
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: #f8f8f8;
+            flex-direction: column;
+            text-align: center;
         }
-        button:hover { background-color: #45a049; }
-        #time { font-size: 24px; margin: 20px; display: block; color: #333; }
-        .stats { margin-top: 30px; font-size: 18px; }
+        h1 {
+            font-size: 24px;
+            color: #333;
+        }
+        #chrono {
+            font-size: 48px;
+            margin: 20px 0;
+            font-weight: bold;
+            color: #000;
+        }
+        .btn {
+            padding: 15px 25px;
+            font-size: 18px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: 0.3s;
+            margin: 5px;
+        }
+        .start {
+            background: #4CAF50;
+            color: white;
+        }
+        .stop {
+            background: #D32F2F;
+            color: white;
+        }
+        .btn:hover {
+            opacity: 0.8;
+        }
+        #result {
+            font-size: 20px;
+            margin-top: 20px;
+            color: #555;
+        }
     </style>
 </head>
 <body>
-
     <h1>Suivi des Devoirs</h1>
-    <span id="time">00:00:00</span>
-    <div class="button-container">
-        <button onclick="startStop()">Démarrer / Arrêter</button>
-        <button onclick="reset()">Réinitialiser</button>
-    </div>
-
-    <div class="stats">
-        <p>Moyenne du mois : <span id="average-time">00:00:00</span></p>
-    </div>
+    <div id="chrono">00:00:00</div>
+    <button class="btn start" onclick="startChrono()">Démarrer la session</button>
+    <button class="btn stop" onclick="stopChrono()">Arrêter la session</button>
+    <div id="result"></div>
 
     <script>
-        let startTime, interval, elapsedTime = 0;
-        let running = false;
-        let totalTime = 0;
-        let sessionCount = 0;
-
-        // Fonction pour démarrer et arrêter le chronomètre
-        function startStop() {
-            if (running) {
-                clearInterval(interval);
-                running = false;
-                totalTime += elapsedTime;
-                sessionCount++;
-                updateAverage();
-            } else {
-                startTime = Date.now() - elapsedTime;
-                interval = setInterval(updateTime, 1000);
-                running = true;
-            }
-        }
-
-        // Fonction pour mettre à jour l'affichage du temps
-        function updateTime() {
-            elapsedTime = Date.now() - startTime;
-            let totalSeconds = Math.floor(elapsedTime / 1000);
-            let hours = Math.floor(totalSeconds / 3600);
-            let minutes = Math.floor((totalSeconds % 3600) / 60);
-            let seconds = totalSeconds % 60;
-            document.getElementById("time").innerText = 
-                `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-        }
-
-        // Fonction pour réinitialiser le chronomètre
-        function reset() {
+        let startTime, interval;
+        function startChrono() {
+            startTime = Date.now();
             clearInterval(interval);
-            running = false;
-            elapsedTime = 0;
-            document.getElementById("time").innerText = "00:00:00";
+            interval = setInterval(updateChrono, 1000);
+            document.getElementById("result").innerHTML = "";
         }
 
-        // Calculer et afficher la moyenne mensuelle du temps de travail
-        function updateAverage() {
-            if (sessionCount > 0) {
-                let averageTime = totalTime / sessionCount;
-                let totalSeconds = Math.floor(averageTime / 1000);
-                let hours = Math.floor(totalSeconds / 3600);
-                let minutes = Math.floor((totalSeconds % 3600) / 60);
-                let seconds = totalSeconds % 60;
-                document.getElementById("average-time").innerText = 
-                    `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-            }
+        function stopChrono() {
+            clearInterval(interval);
+            let elapsedTime = Math.floor((Date.now() - startTime) / 1000);
+            let minutes = Math.floor(elapsedTime / 60);
+            let seconds = elapsedTime % 60;
+            document.getElementById("result").innerHTML = `Temps total : ${minutes} min ${seconds} sec`;
+        }
+
+        function updateChrono() {
+            let elapsedTime = Math.floor((Date.now() - startTime) / 1000);
+            let hours = Math.floor(elapsedTime / 3600);
+            let minutes = Math.floor((elapsedTime % 3600) / 60);
+            let seconds = elapsedTime % 60;
+            document.getElementById("chrono").textContent = 
+                `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
         }
     </script>
-
 </body>
 </html>
